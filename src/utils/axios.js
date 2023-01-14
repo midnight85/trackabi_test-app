@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const proxyURL = "https://cors-anywhere.herokuapp.com"
+const proxyURL = "https://corsanywhereproxy.up.railway.app"
 const customFetch = axios.create({
     baseURL: proxyURL,
 });
