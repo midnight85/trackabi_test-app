@@ -47,7 +47,6 @@ const AddProject = () => {
     //         "cost_hourly_rate": null,
     //         "not_billable": false
     // }
-    console.log(formData)
     return (
         <Wrapper>
             <form onSubmit={(e)=>{

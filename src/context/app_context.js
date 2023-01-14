@@ -7,7 +7,7 @@ import {
 } from "../utils/localStorage";
 import reducer from "../reducers/app_reducer"
 import {
-    SET_LOADING,END_LOADING,SET_ERROR, SET_USER, REMOVE_USER , SET_SELECTED_ORG, GET_PROJECTS,
+    SET_LOADING, END_LOADING, SET_ERROR, SET_USER, REMOVE_USER, SET_SELECTED_ORG, GET_PROJECTS,
 
 } from "../actions";
 import authHeader from "../utils/authHeaders";
@@ -31,9 +31,10 @@ const initialState = {
     projects: {},
     isLoading: false,
     isError: false,
-    isSuccess:false,
+    isSuccess: false,
     errorsMsg: {}
 }
+let localToken = ''
 export const AppProvider = ({children}) => {
     const [state, dispatch] = useReducer(reducer, initialState)
     const login = async (email, password) => {
@@ -71,6 +72,7 @@ export const AppProvider = ({children}) => {
                     avatar
                 } = response.data.data.account
                 const token = response.headers.authorization.split(' ')[1]
+                localToken=token
                 dispatch({
                     type: SET_USER, payload: {
                         first_name,
@@ -79,7 +81,7 @@ export const AppProvider = ({children}) => {
                         phone,
                         name,
                         organizations,
-                        selectedOrg:organizations[0],
+                        selectedOrg: organizations[0],
                         freeOrganizationsCount,
                         trialOrganizationsCount,
                         avatar,
@@ -126,11 +128,15 @@ export const AppProvider = ({children}) => {
                 }
             } catch (error) {
                 console.log(error)
-                // dispatch({type:SET_ERROR)
+                if (error.response.status === 401) {
+                    alert("Unauthorized! Logging Out...")
+                    logout()
+                }
 
             }
         }
     }
+
     const addProject = async (formData) => {
         const orgAlias = state.user.selectedOrg?.alias
         console.log(formData)
@@ -145,10 +151,10 @@ export const AppProvider = ({children}) => {
                 if (response.data.errors || !!response.data.globalError) {
                     console.log(response.data.globalError)
                     dispatch({
-                        type: SET_ERROR, payload: {msg:response.data.globalError}
+                        type: SET_ERROR, payload: {msg: response.data.globalError}
                     })
                 }
-                if (response.status === 200 && response.data.success ) {
+                if (response.status === 200 && response.data.success) {
                     alert('project created')
                     console.log(response)
                     dispatch({type: END_LOADING})
@@ -157,8 +163,59 @@ export const AppProvider = ({children}) => {
 
             } catch (error) {
                 console.log(error)
-                // dispatch({type:SET_ERROR)
+                if (error.response.status === 401) {
+                    alert("Unauthorized! Logging Out...")
+                    logout()
+                }
 
+            }
+        }
+    }
+
+    const updateUser = async (link) => {
+        // https://thhgfhfgh-gfgfh.trackabi.com/get-initial-state?realUtcOffset=120&&timezone=Europe%2FKiev
+        dispatch({type: SET_LOADING})
+        try {
+            const response = await customFetch.get(`/${link}get-initial-state?realUtcOffset=120&&timezone=Europe%2FKiev`, authHeader());
+            if (response.status === 200 && response.data.data.account) {
+                dispatch({
+                    type: SET_USER,
+                    payload: {...response.data.data.account, token:localToken, selectedOrg: response.data.data.account.organizations[0]}
+                })
+            }
+        } catch (error) {
+            alert(error.message)
+            if (error.response.status === 401) {
+                alert("Unauthorized! Logging Out...")
+                logout()
+            }
+        }
+    }
+    const createCompany = async (formData) => {
+        // https://trackabi.com/create-organization?realUtcOffset=120&timezone=Europe%2FKiev
+        dispatch({type: SET_LOADING})
+        try {
+            const response = await customFetch.post("/https://trackabi.com/create-organization?realUtcOffset=120&timezone=Europe%2FKiev", JSON.stringify({
+                RegisterOrganizationForm: formData
+            }), authHeader());
+            if (response.data.errors) {
+                dispatch({
+                    type: SET_ERROR, payload: response.data.errors
+                })
+            }
+            if (response.status === 200 && !!response.data.data.link) {
+                dispatch({type: END_LOADING})
+                alert('Company created')
+                console.log(response.data.data.link)
+                await updateUser(response.data.data.link)
+            }
+        } catch (error) {
+            dispatch({type: END_LOADING})
+            console.log(error)
+            alert(error.message)
+            if (error.response.status === 401) {
+                alert("Unauthorized! Logging Out...")
+                logout()
             }
         }
     }
@@ -175,7 +232,7 @@ export const AppProvider = ({children}) => {
         addUserToLocalStorage(state.user)
     }, [state.user])
     const value = {
-        state, login, logout, fetchProjects, handleSelectOrg, addProject
+        state, login, logout, fetchProjects, handleSelectOrg, addProject, createCompany
     }
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

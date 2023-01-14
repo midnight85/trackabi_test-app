@@ -2,7 +2,7 @@ import './App.css';
 import React from "react";
 import {BrowserRouter, Routes, Route, Link} from "react-router-dom";
 import { LoginPage, NotFoundPage, MainPage, ProtectedRoute} from "./pages";
-import {AddProject, Navbar, Projects} from "./components";
+import {AddProject, CreateCompany, Navbar, Projects} from "./components";
 
 function App() {
 
@@ -22,8 +22,7 @@ function App() {
                         }>
                             <Route index element={<Projects/>}/>
                             <Route path="add-project" element={<AddProject/>}/>
-                            <Route path="create-company" element={<div>create-company</div>}/>
-                            {/*<Route path="profile" element={<Profile/>}/>*/}
+                            <Route path="create-company" element={<CreateCompany/>}/>
                         </Route>
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="*" element={<NotFoundPage/>}/>

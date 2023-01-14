@@ -17,10 +17,8 @@ const columnNames = [
     "Time Billable",
 ]
 const Projects = () => {
-    const {state, fetchProjects} = useAppContext()
-    useEffect(() => {
-        // fetchProjects()
-    }, [])
+    const {state} = useAppContext()
+
     return (
         <>
             {state.projects?.length > 0 ?

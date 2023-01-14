@@ -5,11 +5,10 @@ import {FormInput, Loading} from "../components";
 import {useNavigate} from "react-router-dom";
 
 const LoginPage = () => {
-    //maksvell2407@gmail.com
-    //NOinoiew8124h
+
     const [authData, setAuthData] = useState({
-        email: 'maksvell2407@gmail.com',
-        password: 'NOinoiew8124h'
+        email: '',
+        password: ''
     })
     const handleChange = (e) => {
         setAuthData(prev => ({...prev, [e.target.name]: e.target.value}))
@@ -32,7 +31,7 @@ const LoginPage = () => {
                     {!!state.errorsMsg.password && <span className='error'>{state.errorsMsg.password}</span>}
                 </>
                 : null}
-            <FormInput labelText="Email" name="email" value={authData.email} handleChange={handleChange}/>
+            <FormInput labelText="Email" name="email" type="email" value={authData.email} handleChange={handleChange}/>
             <FormInput labelText="Password" name="password" type="password" value={authData.password}
                        handleChange={handleChange}/>
             <button
@@ -40,6 +39,7 @@ const LoginPage = () => {
                 onClick={() => {
                     login(authData.email, authData.password)
                 }}
+                disabled={!authData.email || !authData.password}
                 className="btn"
             >
                 Login
