@@ -10,22 +10,22 @@ const Navbar = () => {
         <div className="nav-center">
             <div className="nav-header">
                 <div className="org-name">
-                    {state.user.organizations.length > 0 ?
-                        <>
-                            {state.user.selectedOrg?.logo ?
-                                <div className="org-logo">
-                                    <img src={`https://trackabi.com${state.user.selectedOrg?.logo}`} alt="user-img"/>
-                                </div> :
-                                null}
-                            <div className="custom-select">
-                                <select name="orgs" id="orgs-select" onChange={handleSelectOrg} defaultValue={state.user.selectedOrg.name}>
-                                    {state.user.organizations.map((item) => {
-                                        return <option key={item.name} value={item.name}>{item.name}</option>
-                                    })}
-                                </select>
-                            </div>
-                        </>
-                        : <span>no companies</span>}
+                    {state.user.organizations.length > 0 ? <>
+                        {state.user.selectedOrg?.logo ? <div className="org-logo">
+                            <img src={`https://trackabi.com${state.user.selectedOrg?.logo}`} alt="user-img"/>
+                        </div> : null}
+                        <div className="custom-select">
+                            <select name="orgs"
+                                    id="orgs-select"
+                                    onChange={handleSelectOrg}
+                                    defaultValue={state.user.selectedOrg.name}
+                            >
+                                {state.user.organizations.map((item) => {
+                                    return <option key={item.name} value={item.name}>{item.name}</option>
+                                })}
+                            </select>
+                        </div>
+                    </> : <span>no companies</span>}
                 </div>
                 <div className="account-info">
                     {state.user.token ? <div className="user">

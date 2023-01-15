@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {useAppContext} from "../context/app_context";
 import styled from "styled-components";
 
@@ -55,7 +55,20 @@ const Projects = () => {
                                         total_time_billable
                                     } = project
 
-                                    const data = [name, color, short_name, client_id, active ? 'Active' : 'Inactive', start_date, end_date, teams.length, members.length, time_estimated, time_logged_per_days, total_time_billable]
+                                    const data = [
+                                        name,
+                                        color,
+                                        short_name,
+                                        client_id,
+                                        active ? 'Active' : 'Inactive',
+                                        start_date,
+                                        end_date,
+                                        teams.length,
+                                        members.length,
+                                        time_estimated,
+                                        time_logged_per_days,
+                                        total_time_billable
+                                    ]
                                     return (
                                         <tr key={id}>
                                             {data.map((item, index) => {
@@ -70,7 +83,6 @@ const Projects = () => {
                                                 }
                                                 return <td key={index}>{item}</td>
                                             })}
-
                                         </tr>
                                     )
                                 })
@@ -87,8 +99,6 @@ const Projects = () => {
 };
 const Wrapper = styled.div`
   overflow: auto;
-
- 
 
   table {
     border-collapse: collapse;

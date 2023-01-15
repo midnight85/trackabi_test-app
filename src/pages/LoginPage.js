@@ -1,11 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import styled from "styled-components";
 import {useAppContext} from "../context/app_context";
-import {FormInput, Loading} from "../components";
+import {AuthForm, Loading} from "../components";
 import {useNavigate} from "react-router-dom";
 
 const LoginPage = () => {
-
     const [authData, setAuthData] = useState({
         email: '',
         password: ''
@@ -13,68 +11,19 @@ const LoginPage = () => {
     const handleChange = (e) => {
         setAuthData(prev => ({...prev, [e.target.name]: e.target.value}))
     }
-    const {state, login} = useAppContext();
+    const {state} = useAppContext();
     const navigate = useNavigate();
     useEffect(() => {
         if (!!state.user.token) {
             navigate('/')
         }
     }, [state.isLoading])
+
     if (state.isLoading) {
         return <Loading/>
     }
-    return (<Wrapper>
-        <div className='title'>login page</div>
-        <form className='form'>
-            {state.isError ? <>
-                    {!!state.errorsMsg.email && <span className='error'>{state.errorsMsg.email}</span>}
-                    {!!state.errorsMsg.password && <span className='error'>{state.errorsMsg.password}</span>}
-                </>
-                : null}
-            <FormInput labelText="Email" name="email" type="email" value={authData.email} handleChange={handleChange}/>
-            <FormInput labelText="Password" name="password" type="password" value={authData.password}
-                       handleChange={handleChange}/>
-            <button
-                type="button"
-                onClick={() => {
-                    login(authData.email, authData.password)
-                }}
-                disabled={!authData.email || !authData.password}
-                className="btn"
-            >
-                Login
-            </button>
-        </form>
-    </Wrapper>);
+    return <AuthForm authData={authData} title={'Login page'} handleChange={handleChange}/>;
 };
-const Wrapper = styled.div`
-  margin: 0 auto;
-  max-width: 500px;
-  width: 100%;
-  padding: 30px 15px;
 
-  .title {
-    font-size: 22px;
-    text-align: center;
-    margin-bottom: 30px;
-    text-transform: capitalize;
-  }
 
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 100%;
-  }
-
-  .btn {
-    padding: 10px;
-  }
-
-  .error {
-    color: red;
-    text-align: center;
-  }
-
-`
 export default LoginPage;

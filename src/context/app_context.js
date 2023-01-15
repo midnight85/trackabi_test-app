@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useReducer} from "react";
+import React, {useContext, useEffect, useReducer, useState} from "react";
 import {
     getUserFromLocalStorage,
     addUserToLocalStorage,
@@ -34,9 +34,9 @@ const initialState = {
     isSuccess: false,
     errorsMsg: {}
 }
-let localToken = ''
 export const AppProvider = ({children}) => {
     const [state, dispatch] = useReducer(reducer, initialState)
+    const [userToken, setUserToken] = useState()
     const login = async (email, password) => {
         dispatch({type: SET_LOADING})
         try {
@@ -58,8 +58,7 @@ export const AppProvider = ({children}) => {
                     }
                 })
             }
-            if (response.status === 200 && !!response.data.data.account) {
-                console.log(response);
+            if (response.status === 200 && !!response.data.data?.account) {
                 const {
                     first_name,
                     last_name,
@@ -72,7 +71,7 @@ export const AppProvider = ({children}) => {
                     avatar
                 } = response.data.data.account
                 const token = response.headers.authorization.split(' ')[1]
-                localToken=token
+                setUserToken(token)
                 dispatch({
                     type: SET_USER, payload: {
                         first_name,
@@ -92,8 +91,7 @@ export const AppProvider = ({children}) => {
             }
         } catch (error) {
             console.log(error)
-            // dispatch({type:SET_ERROR)
-
+            dispatch({type: SET_ERROR})
         }
     }
     const logout = () => {
@@ -136,7 +134,6 @@ export const AppProvider = ({children}) => {
             }
         }
     }
-
     const addProject = async (formData) => {
         const orgAlias = state.user.selectedOrg?.alias
         console.log(formData)
@@ -171,7 +168,6 @@ export const AppProvider = ({children}) => {
             }
         }
     }
-
     const updateUser = async (link) => {
         // https://thhgfhfgh-gfgfh.trackabi.com/get-initial-state?realUtcOffset=120&&timezone=Europe%2FKiev
         dispatch({type: SET_LOADING})
@@ -180,7 +176,11 @@ export const AppProvider = ({children}) => {
             if (response.status === 200 && response.data.data.account) {
                 dispatch({
                     type: SET_USER,
-                    payload: {...response.data.data.account, token:localToken, selectedOrg: response.data.data.account.organizations[0]}
+                    payload: {
+                        ...response.data.data.account,
+                        token: userToken,
+                        selectedOrg: response.data.data.account.organizations[0]
+                    }
                 })
             }
         } catch (error) {
@@ -199,20 +199,19 @@ export const AppProvider = ({children}) => {
                 RegisterOrganizationForm: formData
             }), authHeader());
             if (response.data.errors) {
+                alert(response.data.errors.alias)
                 dispatch({
                     type: SET_ERROR, payload: response.data.errors
                 })
             }
-            if (response.status === 200 && !!response.data.data.link) {
+            if (response.status === 200 && !!response.data?.data?.link) {
                 dispatch({type: END_LOADING})
                 alert('Company created')
-                console.log(response.data.data.link)
                 await updateUser(response.data.data.link)
             }
         } catch (error) {
             dispatch({type: END_LOADING})
             console.log(error)
-            alert(error.message)
             if (error.response.status === 401) {
                 alert("Unauthorized! Logging Out...")
                 logout()

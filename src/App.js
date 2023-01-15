@@ -1,12 +1,10 @@
 import './App.css';
 import React from "react";
-import {BrowserRouter, Routes, Route, Link} from "react-router-dom";
+import {BrowserRouter, Routes, Route} from "react-router-dom";
 import { LoginPage, NotFoundPage, MainPage, ProtectedRoute} from "./pages";
 import {AddProject, CreateCompany, Navbar, Projects} from "./components";
 
 function App() {
-
-
     return (
         <BrowserRouter>
             <header className='header'>

@@ -1,108 +1,63 @@
-import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
 import styled from "styled-components";
-import FormInput from "./UI/FormInput";
+import FormInput from "./FormInput";
 import {useAppContext} from "../context/app_context";
 
-const AuthForm = ({title, handleClick}) => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const {authError, handleAuthError} = useAppContext();
-    useEffect(() => {
-        handleAuthError();
-    }, []);
-
-    return (
-        <Wrapper>
-            <div className="form-title">{title}</div>
-            <form className="form">
-                {authError.errorCode && (
-                    <div
-                        style={{
-                            color: "red",
-                            padding: "0px 0px 20px 10px",
-                            fontSize: "1rem",
-                        }}
-                    >
-                        {authError.errorCode?.split("/")[1]}
-                    </div>
-                )}
-                <FormInput label="Email" value={email} setValue={setEmail} />
-                <FormInput
-                    label="Password"
-                    type="password"
-                    value={password}
-                    setValue={setPassword}
-                />
-                <button
-                    disabled={!email || !password}
-                    className="btn"
-                    type="button"
-                    onClick={() => handleClick(email, password)}
-                >
-                    {title}
-                </button>
-
-            </form>
-
-            {title === "log in" ? (
-                <p>
-                    Don't have an Account? <Link to="/register">Register</Link>
-                </p>
-            ) : (
-                <p>
-                    Have an account already? <Link to="/login">Log in</Link>
-                </p>
-            )}
-        </Wrapper>
-    );
+const AuthForm = ({authData, title, handleChange}) => {
+    const {state, login} = useAppContext();
+    return (<Wrapper>
+        <div className='title'>{title}</div>
+        <form className='form'>
+            {state.isError ? <>
+                    {!!state.errorsMsg.email && <span className='error'>{state.errorsMsg.email}</span>}
+                    {!!state.errorsMsg.password && <span className='error'>{state.errorsMsg.password}</span>}
+                </>
+                : null}
+            <FormInput labelText="Email" name="email" type="email" value={authData.email} handleChange={handleChange}/>
+            <FormInput labelText="Password" name="password" type="password" value={authData.password}
+                       handleChange={handleChange}/>
+            <button
+                type="button"
+                onClick={() => {
+                    login(authData.email, authData.password)
+                }}
+                disabled={!authData.email || !authData.password}
+                className="btn"
+            >
+                Login
+            </button>
+        </form>
+    </Wrapper>);
 };
 
 const Wrapper = styled.div`
+  margin: 0 auto;
   max-width: 500px;
   width: 100%;
-  padding: 10px;
-  p {
-    margin-top: 10px;
-    font-size: 1rem;
-    text-align: center;
-  }
-  a {
-    transition: all 0.3s ease 0s;
-  }
-  a:hover {
-    color: var(--clr-primary-5);
-  }
+  padding: 30px 15px;
 
-  .form-title {
-    font-style: normal;
-    font-weight: bold;
-    font-size: 34px;
-    line-height: 40px;
-    margin-bottom: 40px;
+  .title {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 30px;
     text-transform: capitalize;
   }
 
   .form {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
     width: 100%;
   }
 
   .btn {
-    padding: 20px;
-    font-size: 1rem;
-    border-radius: 10px;
-  }
-  .btn:disabled {
-    opacity: 0.5;
-    pointer-events: none;
+    padding: 10px;
   }
 
-  .err {
-    outline: 1px solid #ff0000;
+  .error {
+    color: red;
+    text-align: center;
   }
-`;
+
+`
 
 export default AuthForm;
